@@ -103,7 +103,6 @@ public class EmotionDiaryController {
 
         long count = emotionDiaryService.countByUser(user);
 
-        // ✨ 여기 추가
         String currentEmotion = emotionService.getTodayEmotion(user)
                 .map(Emotion::getDetailEmotion)
                 .orElse("없음");
