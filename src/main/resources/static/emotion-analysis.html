@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정 분석 결과</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #fdfdfd;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin-bottom: 30px;
+    }
+
+    canvas {
+      max-width: 600px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li onclick="location.href='Home.html'">Home</li>
+    <li onclick="location.href='History.html'">History</li>
+    <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+    <li onclick="location.href='Profile.html'"><strong>Profile</strong></li>
+  </ul>
+</div>
+
+<!-- 본문 -->
+<div class="content">
+  <h2>📊 최근 감정 선택 분석</h2>
+  <canvas id="emotionChart"></canvas>
+</div>
+
+<script>
+  fetch("/api/emotion/analysis", {
+    credentials: "include"
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("데이터 로딩 실패");
+      return response.json();
+    })
+    .then(data => {
+      const ctx = document.getElementById("emotionChart").getContext("2d");
+
+      const colors = [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(200, 200, 200, 0.6)'
+      ];
+
+      const borderColors = colors.map(c => c.replace('0.6', '1'));
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            label: '상위 감정 선택 횟수',
+            data: Object.values(data),
+            backgroundColor: colors,
+            borderColor: borderColors,
+            borderWidth: 1,
+            borderRadius: 10,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#333',
+              titleColor: '#fff',
+              bodyColor: '#fff'
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                },
+                color: '#333'
+              },
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                font: {
+                  size: 14
+                },
+                color: '#333'
+              },
+              grid: {
+                color: '#eee'
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("감정 분석 데이터를 불러오는 데 실패했습니다.");
+    });
+</script>
+
+
+</body>
+</html>

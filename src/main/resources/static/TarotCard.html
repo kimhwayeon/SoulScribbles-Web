@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tarot Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Fredoka:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .top-right-button {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 12px;
+      padding: 6px 12px;
+      background-color: #e4aee8;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card-flip {
+      width: 80px;
+      height: 130px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+
+    .card-flip.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      background-size: cover;
+    }
+
+    .card-front {
+      background-image: url('image/tarot card.jpg');
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-content button {
+      margin: 0 10px;
+      padding: 8px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #e4aee8;
+    }
+
+    .result-section {
+      display: none;
+      margin-top: 40px;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .tarot-image {
+      width: 200px;
+      height: 320px;
+      border-radius: 10px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고" />
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li onclick="location.href='Home.html'">Home</li>
+    <li onclick="location.href='History.html'">History</li>
+    <li onclick="location.href='TarotCard.html'"><strong>Tarot Card</strong></li>
+    <li onclick="location.href='Profile.html'">Profile</li>
+  </ul>
+</div>
+
+<div class="content">
+  <!-- 타로 기록 보기 버튼 -->
+  <button class="top-right-button" onclick="location.href='TarotHistory.html'">📜 타로 기록 보기</button>
+
+  <p id="instruction">마음에 드는 카드를 한 장 골라보세요.</p>
+  <div class="card-container" id="cardBox"></div>
+
+  <div class="result-section" id="resultSection">
+    <div class="tarot-image" style="background-image: url('image/tarot card.jpg');"></div>
+    <div class="tarot-image" id="frontCard"></div>
+  </div>
+</div>
+
+<div class="modal" id="confirmModal">
+  <div class="modal-content">
+    <p>이 카드를 선택하시겠습니까?</p>
+    <button onclick="confirmYes()">네</button>
+    <button onclick="closeModal()">아니오</button>
+  </div>
+</div>
+
+<script>
+  let selectedCardNumber = null;
+  let selectedCardElement = null;
+  let alreadyDrawn = false;
+
+  window.onload = async function () {
+    const container = document.getElementById("cardBox");
+
+    try {
+      const res = await fetch("/api/tarot/today", {
+        method: "GET",
+        credentials: "include"
+      });
+
+      if (res.status === 200) {
+        const card = await res.json();
+        alreadyDrawn = true;
+        showCardResult(card.cardNumber);
+      } else {
+        for (let i = 1; i <= 12; i++) {
+          const cardDiv = document.createElement("div");
+          cardDiv.className = "card-flip";
+          cardDiv.onclick = () => flipCard(cardDiv, i);
+          cardDiv.innerHTML = `
+            <div class="card-inner">
+              <div class="card-front"></div>
+              <div class="card-back" style="background-image: url('image/card${i}.png')"></div>
+            </div>`;
+          container.appendChild(cardDiv);
+        }
+      }
+    } catch (err) {
+      console.error("서버 오류:", err);
+    }
+  };
+
+  function flipCard(cardElement, cardNumber) {
+    if (alreadyDrawn) {
+      alert("오늘은 이미 타로 카드를 뽑았습니다!");
+      return;
+    }
+
+    selectedCardNumber = cardNumber;
+    selectedCardElement = cardElement;
+    openModal();
+  }
+
+  function openModal() {
+    document.getElementById("confirmModal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("confirmModal").style.display = "none";
+  }
+
+  async function confirmYes() {
+    if (!selectedCardNumber || !selectedCardElement) return;
+
+    const inner = selectedCardElement.querySelector('.card-inner');
+    inner.style.transform = 'rotateY(180deg)';
+
+    try {
+      const response = await fetch("/api/tarot/draw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ cardNumber: selectedCardNumber })
+      });
+
+      if (response.ok) {
+        alreadyDrawn = true;
+
+        // 백엔드에서 실제 뽑힌 카드 다시 받아오기
+        setTimeout(async () => {
+          const res = await fetch("/api/tarot/today", { credentials: "include" });
+          const data = await res.json();
+          showCardResult(data.cardNumber);
+        }, 800);
+      } else {
+        const msg = await response.text();
+        alert("타로 저장 실패: " + msg);
+      }
+    } catch (err) {
+      alert("서버 오류");
+    }
+
+    closeModal();
+  }
+
+  function showCardResult(cardNum) {
+    document.getElementById("cardBox").style.display = "none";
+    document.getElementById("instruction").innerText = "오늘의 타로 카드 결과입니다!";
+    document.getElementById("frontCard").style.backgroundImage = `url('image/card${cardNum}.png')`;
+    document.getElementById("resultSection").style.display = "flex";
+  }
+</script>
+</body>
+</html>

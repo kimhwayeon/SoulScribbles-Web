@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정 선택</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .emotion-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .emotion {
+      background-color: #f6d776;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .emotion:hover {
+      background-color: #f0c944;
+    }
+  </style>
+</head>
+<body>
+
+<h2>오늘의 감정을 선택하세요</h2>
+<div class="emotion-list">
+  <div class="emotion" onclick="selectTopEmotion('행복')">😊 행복</div>
+  <div class="emotion" onclick="selectTopEmotion('사랑')">😍 사랑</div>
+  <div class="emotion" onclick="selectTopEmotion('슬픔')">😢 슬픔</div>
+  <div class="emotion" onclick="selectTopEmotion('분노')">😠 분노</div>
+  <div class="emotion" onclick="selectTopEmotion('혐오')">🤢 혐오</div>
+  <div class="emotion" onclick="selectTopEmotion('부러움')">😕 부러움</div>
+  <div class="emotion" onclick="selectTopEmotion('두려움')">😱 두려움</div>
+  <div class="emotion" onclick="selectTopEmotion('질투')">😤 질투</div>
+  <div class="emotion" onclick="selectTopEmotion('수치감')">😳 수치감</div>
+  <div class="emotion" onclick="selectTopEmotion('죄책감')">😔 죄책감</div>
+</div>
+
+<script>
+  const emotionPageMap = {
+    '행복': 'popup-emotion/행복.html',
+    '사랑': 'popup-emotion/사랑.html',
+    '슬픔': 'popup-emotion/슬픔.html',
+    '분노': 'popup-emotion/분노.html',
+    '혐오': 'popup-emotion/혐오.html',
+    '부러움': 'popup-emotion/부러움.html',
+    '두려움': 'popup-emotion/두려움.html',
+    '질투': 'popup-emotion/질투.html',
+    '수치감': 'popup-emotion/수치감.html',
+    '죄책감': 'popup-emotion/죄책감.html'
+  };
+
+  function selectTopEmotion(topEmotion) {
+    localStorage.setItem('topEmotion', topEmotion);
+    const targetPage = emotionPageMap[topEmotion];
+    if (targetPage) {
+      window.location.href = targetPage;
+    } else {
+      localStorage.setItem('selectedEmotion', topEmotion);
+      window.close();
+    }
+  }
+</script>
+
+</body>
+</html>

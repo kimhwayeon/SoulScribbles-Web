@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>SOUL SCRIBBLES 로그인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      text-align: center;
+      border: 1px solid #ccc;
+      padding: 60px;
+      padding-top: 40px;
+      border-radius: 8px;
+      width: 350px;
+    }
+    .login-container img {
+      width: 100px;
+      margin-bottom: 5px;
+    }
+    .login-container h1 {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 35px;
+      font-family: 'Fredoka', sans-serif;
+    }
+    .login-container input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin: 6px 0;
+      background-color: #e8e8e8;
+      border: none;
+      border-radius: 3px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .button-group button {
+      width: 48%;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      background-color: #90caf9;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .button-group button:hover {
+      background-color: #64b5f6;
+    }
+  </style>
+</head>
+<body>
+<div class="login-container">
+  <img src="image/logo.png" alt="로고" onclick="location.href='login.html'">
+  <h1>SOUL SCRIBBLES</h1>
+  <input type="text" id="email" placeholder="E-mail" required><br>
+  <input type="password" id="password" placeholder="비밀번호" required><br>
+  <div class="button-group">
+    <button onclick="location.href='join.html'">회원가입</button>
+    <button onclick="login()">로그인</button>
+  </div>
+</div>
+<script>
+  async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const response = await fetch("/api/user/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify({ email, password })
+  });
+
+  const result = await response.json();
+
+  if (response.ok) {
+    location.href = result.redirect;
+  } else {
+    alert(result.error);
+  }
+}
+
+
+</script>
+
+</body>
+</html>

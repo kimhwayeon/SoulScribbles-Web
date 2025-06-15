@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>질투 세부 감정 선택</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .emotion-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .emotion {
+      background-color: #fbeeb2;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .emotion:hover {
+      background-color: #f6e096;
+    }
+    .back {
+      margin-bottom: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="back" onclick="location.href='../popup-select-emotion.html'">← 돌아가기</div>
+
+<h2>질투를 고르셨군요! 어떤 종류의 질투였나요?</h2>
+
+<div class="emotion-detail">
+  <div class="emotion" onclick="selectEmotion('집착')">집착</div>
+  <div class="emotion" onclick="selectEmotion('경쟁심')">경쟁심</div>
+  <div class="emotion" onclick="selectEmotion('불신')">불신</div>
+  <div class="emotion" onclick="selectEmotion('소유욕')">소유욕</div>
+</div>
+
+<script>
+  function selectEmotion(detailEmotion) {
+    const topEmotion = '질투';
+
+    // 1. localStorage 저장
+    localStorage.setItem('selectedEmotion', detailEmotion);
+    localStorage.setItem('topEmotion', topEmotion);
+
+    // 2. 서버 전송
+    fetch('/api/emotion/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topEmotion, detailEmotion })
+    })
+    .then(res => res.text())
+    .then(message => {
+      alert(message);
+      if (message.includes("완료")) {
+        window.close();
+      }
+    })
+    .catch(error => {
+      alert('전송 실패: ' + error.message);
+      window.close();
+    });
+  }
+</script>
+
+</body>
+</html>

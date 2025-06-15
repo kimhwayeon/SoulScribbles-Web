@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>분노 세부 감정 선택</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .emotion-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .emotion {
+      background-color: #f3aeae;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .emotion:hover {
+      background-color: #ffa5a5;
+    }
+    .back {
+      margin-bottom: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="back" onclick="location.href='../popup-select-emotion.html'">← 돌아가기</div>
+
+<h2>분노를 고르셨군요! 어떤 종류의 분노였나요?</h2>
+
+<div class="emotion-detail">
+  <div class="emotion" onclick="selectEmotion('화남')">화남</div>
+  <div class="emotion" onclick="selectEmotion('복수심')">복수심</div>
+  <div class="emotion" onclick="selectEmotion('심술남')">심술남</div>
+  <div class="emotion" onclick="selectEmotion('속상함')">속상함</div>
+  <div class="emotion" onclick="selectEmotion('짜증')">짜증</div>
+  <div class="emotion" onclick="selectEmotion('안달남')">안달남</div>
+</div>
+
+<script>
+  function selectEmotion(detailEmotion) {
+    const topEmotion = '분노';
+
+    // 1. localStorage에 감정 저장
+    localStorage.setItem('selectedEmotion', detailEmotion);
+    localStorage.setItem('topEmotion', topEmotion);
+
+    // 2. 서버로 감정 전송
+    fetch('/api/emotion/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topEmotion, detailEmotion })
+    })
+    .then(res => res.text())
+    .then(message => {
+      alert(message);
+      if (message.includes("완료")) {
+        window.close();
+      }
+    })
+    .catch(error => {
+      alert('전송 실패: ' + error.message);
+      window.close();
+    });
+  }
+</script>
+
+</body>
+</html>

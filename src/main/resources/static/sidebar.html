@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+          margin: 0;
+          font-family: 'Arial', sans-serif;
+          display: flex;
+        }
+
+        .sidebar {
+          width: 235px;
+          height: 100vh;
+          border-right: 1px solid #ccc;
+          padding: 20px;
+          box-sizing: border-box;
+        }
+
+        .sidebar img {
+          width: 40px;
+          vertical-align: middle;
+        }
+
+        .sidebar h1 {
+          font-family: 'Fredoka', sans-serif;
+          font-size: 18px;
+          display: inline-block;
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+
+        .menu {
+          margin-top: 40px;
+          list-style: none;
+          padding: 0;
+        }
+
+        .menu li {
+          margin: 16px 0;
+          font-size: 16px;
+          cursor: pointer;
+        }
+
+        </style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+    <div>
+        <img src="image/logo.png" alt="로고">
+        <h1>SOUL SCRIBBLES</h1>
+    </div>
+    <ul class="menu">
+        <li onclick="location.href='Home.html'">Home</li>
+        <li onclick="location.href='History.html'">History</li>
+        <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+        <li onclick="location.href='Profile.html'">Profile</li>
+    </ul>
+</div>

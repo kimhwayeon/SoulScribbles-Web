@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #ffffff;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 10px;
+    }
+
+    .box {
+      background-color: #cce4f6;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      width: 95%;
+    }
+
+    .logout {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #444;
+      cursor: pointer;
+    }
+
+    .box p {
+      margin: 0;
+    }
+
+    .box p:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li onclick="location.href='Home.html'">Home</li>
+    <li onclick="location.href='History.html'">History</li>
+    <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+    <li onclick="location.href='Profile.html'"><strong>Profile</strong></li>
+  </ul>
+</div>
+
+<div class="content">
+  <h2>Profile</h2>
+
+  <div class="box" id="userInfoBox">
+    <p>사용자 정보를 불러오는 중입니다...</p>
+  </div>
+
+  <div class="box" id="emotionInfoBox">
+    <p>감정 데이터를 불러오는 중입니다...</p>
+  </div>
+
+  <div class="box">
+    <p onclick="location.href='emotion-analysis.html'">→ 내 감정 분석 결과 보러가기</p>
+  </div>
+
+  <div class="logout" onclick="logout()">[로그아웃]</div>
+</div>
+
+<script>
+  // 사용자 정보
+  fetch('/api/user/me', {
+    method: 'GET',
+    credentials: 'include'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("로그인 정보 없음");
+    return res.json();
+  })
+  .then(user => {
+    document.getElementById("userInfoBox").innerHTML = `
+      <p><strong>${user.name}</strong> 님<br>
+         ${user.email}<br>
+         가입일 : ${user.joinDate}</p>
+    `;
+  })
+  .catch(err => {
+    document.getElementById("userInfoBox").innerHTML = `
+      <p>사용자 정보를 불러오지 못했습니다. 로그인 후 이용해주세요.</p>
+    `;
+  });
+
+  // 감정 데이터
+  fetch('/api/emotion-diary/summary', {
+    method: 'GET',
+    credentials: 'include'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("감정 데이터 없음");
+    return res.json();
+  })
+  .then(summary => {
+    const detailEmotion = summary.latestEmotion;
+
+    document.getElementById("emotionInfoBox").innerHTML = `
+      <p>총 감정 일기: ${summary.count}편<br>
+        현재 감정 상태: ${summary.latestEmotion || "없음"}</p>
+`;
+
+  })
+  .catch(err => {
+    document.getElementById("emotionInfoBox").innerHTML = `
+      <p>감정 데이터를 불러오지 못했습니다.</p>
+    `;
+  });
+
+  function logout() {
+    const confirmLogout = confirm("로그아웃하시겠습니까?");
+    if (!confirmLogout) return;
+
+    fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+    .then(() => {
+      sessionStorage.clear();
+      location.href = 'login.html';
+    });
+  }
+
+</script>
+
+</body>
+</html>

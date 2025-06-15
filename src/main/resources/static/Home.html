@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 0;
+      background-image: url('image/하늘배경.png');
+      background-size: auto 100%;
+      background-position: bottom center;
+      background-repeat: no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    .avatar {
+      width: 300px;
+      max-width: 90%;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 사이드바 -->
+  <div class="sidebar">
+    <div>
+      <img src="image/logo.png" alt="로고">
+      <h1>SOUL SCRIBBLES</h1>
+    </div>
+    <ul class="menu">
+      <li onclick="location.href='Home.html'"><strong>Home</strong></li>
+      <li onclick="location.href='History.html'">History</li>
+      <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+      <li onclick="location.href='Profile.html'">Profile</li>
+    </ul>
+  </div>
+
+  <!-- 본문 -->
+  <div class="content">
+    <img id="avatarImage" class="avatar" src="" alt="아바타 이미지">
+  </div>
+
+  <script>
+    const positiveEmotions = [
+      "즐거움", "설렘", "만족", "희망", "감사함", "재미", "기쁨", "유쾌함", "열정", "신남", "편안함", "감사함", "황홀함",
+      "매력", "동정", "흠모", "우애", "갈망", "다정다감", "심취", "욕망", "훙뷴", "연민", "좋아함", "감동"
+    ];
+
+    const selectedEmotion = localStorage.getItem("selectedEmotion");
+    const avatarImg = document.getElementById("avatarImage");
+
+    if (positiveEmotions.includes(selectedEmotion)) {
+      avatarImg.src = "image/avatar_positive.png";
+    } else {
+      avatarImg.src = "image/avatar_negative.png";
+    }
+  </script>
+
+</body>
+</html>

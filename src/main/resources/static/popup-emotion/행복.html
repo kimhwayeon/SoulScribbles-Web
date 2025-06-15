@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>행복 세부 감정 선택</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+
+    h2 {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .emotion-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .emotion {
+      background-color: #f5ec7e;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .emotion:hover {
+      background-color: #ece05f;
+    }
+
+    .back {
+      margin-bottom: 20px;
+      cursor: pointer;
+      color: #333;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="back" onclick="location.href='../popup-select-emotion.html'">← 돌아가기</div>
+
+<h2>행복을 고르셨군요. 어떤 종류의 행복이었나요?</h2>
+
+<div class="emotion-detail">
+  <div class="emotion" onclick="submitEmotion('만족')">만족</div>
+  <div class="emotion" onclick="submitEmotion('즐거움')">즐거움</div>
+  <div class="emotion" onclick="submitEmotion('유쾌함')">유쾌함</div>
+  <div class="emotion" onclick="submitEmotion('황홀함')">황홀함</div>
+  <div class="emotion" onclick="submitEmotion('기쁨')">기쁨</div>
+  <div class="emotion" onclick="submitEmotion('열정')">열정</div>
+  <div class="emotion" onclick="submitEmotion('설렘')">설렘</div>
+  <div class="emotion" onclick="submitEmotion('재미')">재미</div>
+  <div class="emotion" onclick="submitEmotion('신남')">신남</div>
+  <div class="emotion" onclick="submitEmotion('희망')">희망</div>
+  <div class="emotion" onclick="submitEmotion('편안함')">편안함</div>
+  <div class="emotion" onclick="submitEmotion('감사함')">감사함</div>
+</div>
+
+<script>
+  function submitEmotion(detailEmotion) {
+    const topEmotion = localStorage.getItem('topEmotion');
+
+    localStorage.setItem('selectedEmotion', detailEmotion);
+
+    fetch('/api/emotion/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topEmotion, detailEmotion })
+    })
+    .then(res => res.text())
+    .then(message => {
+      alert(message);
+      if (message.includes("완료")) {
+        window.close(); // 팝업 닫기
+      }
+    })
+    .catch(error => {
+      alert('전송 실패: ' + error.message);
+      window.close();
+    });
+  }
+</script>
+
+</body>
+</html>

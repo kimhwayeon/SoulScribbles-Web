@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>타로 기록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Fredoka:wght@500&display=swap" rel="stylesheet" />
+    <style>
+        body {
+          margin: 0;
+          font-family: 'Arial', sans-serif;
+          display: flex;
+        }
+
+        .sidebar {
+          width: 190px;
+          height: 100vh;
+          border-right: 1px solid #ccc;
+          padding: 20px;
+          box-sizing: border-box;
+        }
+
+        .sidebar img {
+          width: 40px;
+          vertical-align: middle;
+        }
+
+        .sidebar h1 {
+          font-family: 'Fredoka', sans-serif;
+          font-size: 17px;
+          display: inline-block;
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+
+        .menu {
+          margin-top: 40px;
+          list-style: none;
+          padding: 0;
+        }
+
+        .menu li {
+          margin: 16px 0;
+          font-size: 14px;
+          cursor: pointer;
+        }
+
+        .content {
+          flex: 1;
+          padding: 40px;
+          background-color: #f9f9f9;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+        }
+
+        h2 {
+          margin-bottom: 30px;
+          font-size:17px;
+        }
+
+        .history-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 30px;
+          justify-content: center;
+        }
+
+        .card-entry {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          padding: 15px;
+          transition: transform 0.2s;
+          cursor: pointer;
+        }
+
+        .card-entry:hover {
+          transform: scale(1.05);
+        }
+
+        .card-entry img {
+          width: 120px;
+          height: 190px;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+
+        .card-entry p {
+          margin-top: 10px;
+          font-size: 14px;
+          color: #333;
+        }
+
+        #imageModal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 999;
+        }
+
+        #imageModal img {
+          max-width: 300px;
+          max-height: 90vh;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .back-button {
+          position: absolute;
+          top: 20px;
+          right: 30px;
+          font-size: 12px;
+          padding: 6px 14px;
+          background-color: #e4aee8;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+    <div>
+        <img src="image/logo.png" alt="로고" />
+        <h1>SOUL SCRIBBLES</h1>
+    </div>
+    <ul class="menu">
+        <li onclick="location.href='Home.html'">Home</li>
+        <li onclick="location.href='History.html'">History</li>
+        <li onclick="location.href='TarotCard.html'"><strong>Tarot Card</strong></li>
+        <li onclick="location.href='Profile.html'">Profile</li>
+    </ul>
+</div>
+
+
+<div class="content">
+    <button class="back-button" onclick="location.href='TarotCard.html'">← 타로 카드 페이지로</button>
+    <h2>나의 타로 기록</h2>
+    <div class="history-container" id="historyBox"></div>
+</div>
+
+<!-- 이미지 모달 -->
+<div id="imageModal" onclick="closeImageModal()">
+    <img id="modalImage" src="" alt="확대된 카드" />
+</div>
+
+<script>
+    window.onload = async function () {
+      try {
+        const response = await fetch("/api/tarot/history", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        if (response.ok) {
+          const records = await response.json();
+          const box = document.getElementById("historyBox");
+
+          if (records.length === 0) {
+            box.innerHTML = "<p>기록이 없습니다.</p>";
+          } else {
+            records.forEach(record => {
+              const card = document.createElement("div");
+              card.className = "card-entry";
+              card.onclick = () => openImageModal(record.cardNumber);
+
+              const img = document.createElement("img");
+              img.src = `image/card${record.cardNumber}.png`;
+
+              const date = document.createElement("p");
+              // 날짜 형식 보정
+              const formattedDate = record.drawDate ? new Date(record.drawDate).toLocaleDateString('ko-KR') : "날짜 없음";
+              date.textContent = formattedDate;
+
+              card.appendChild(img);
+              card.appendChild(date);
+              box.appendChild(card);
+            });
+          }
+        } else {
+          alert("기록을 불러오는 데 실패했습니다.");
+        }
+      } catch (e) {
+        console.error("에러 발생:", e);
+        alert("서버와의 연결 중 문제가 발생했습니다.");
+      }
+    };
+
+    function openImageModal(cardNumber) {
+      const modal = document.getElementById("imageModal");
+      const img = document.getElementById("modalImage");
+      img.src = `image/card${cardNumber}.png`;
+      modal.style.display = "flex";
+    }
+
+    function closeImageModal() {
+      document.getElementById("imageModal").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

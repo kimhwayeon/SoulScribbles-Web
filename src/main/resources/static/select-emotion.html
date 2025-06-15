@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정 선택</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Arial', sans-serif; display: flex; }
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .content {
+      flex: 1; padding: 40px; background-color: #f9f9f9;
+    }
+    .emotion-box {
+      background-color: #fff; border-radius: 8px; padding: 30px;
+      width: 100%; max-width: 600px; height: 400px; margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .emotion-box h3 { margin-bottom: 30px; font-size: 14px; color: #444; }
+    .emotion-section { margin-bottom: 20px; }
+    .emotion-section .label {
+      display: inline-block; padding: 5px 12px; border-radius: 12px;
+      color: white; font-size: 14px; margin-bottom: 10px;
+    }
+    .positive .label { background-color: #fdbb3f; }
+    .negative .label { background-color: #3d3f8f; }
+    .emotions { display: flex; flex-direction: column; gap: 25px; margin-top: 10px; }
+    .emotion-row { display: flex; gap: 35px; }
+    .emotions span {
+      font-size: 16px; background-color: transparent; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li>Home</li>
+    <li>History</li>
+    <li>Tarot Card</li>
+    <li>Profile</li>
+  </ul>
+</div>
+
+<div class="content">
+  <div class="emotion-box">
+    <h3>오늘 느낀 감정은 무엇인가요?</h3>
+    <div class="emotion-section positive">
+      <span class="label">긍정</span>
+      <div class="emotions">
+        <div class="emotion-row">
+          <span onclick="goToDetail('행복')">😊 행복</span>
+          <span onclick="goToDetail('사랑')">😍 사랑</span>
+        </div>
+      </div>
+    </div>
+    <div class="emotion-section negative">
+      <span class="label">부정</span>
+      <div class="emotions">
+        <div class="emotion-row">
+          <span onclick="goToDetail('슬픔')">😢 슬픔</span>
+          <span onclick="goToDetail('분노')">😠 분노</span>
+          <span onclick="goToDetail('혐오')">🤢 혐오</span>
+          <span onclick="goToDetail('부러움')">😕 부러움</span>
+        </div>
+        <div class="emotion-row">
+          <span onclick="goToDetail('두려움')">😱 두려움</span>
+          <span onclick="goToDetail('질투')">😤 질투</span>
+          <span onclick="goToDetail('수치감')">😳 수치감</span>
+          <span onclick="goToDetail('죄책감')">😔 죄책감</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function goToDetail(emotion) {
+    localStorage.setItem('topEmotion', emotion);
+    location.href = `sub-emotion/${emotion}.html`; // 예: sub-emotion/행복.html
+  }
+</script>
+
+</body>
+</html>

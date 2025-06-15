@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정일기 상세 보기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #fff;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      color: #777;
+      margin-bottom: 30px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .field div {
+      font-size: 14px;
+      font-weight: normal;
+      font-family: 'Arial', sans-serif;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .buttons {
+      margin-top: 30px;
+    }
+
+    .buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      color: black;
+    }
+
+    .buttons button.edit {
+      background-color: #d1e6f5;
+    }
+
+    .buttons button.delete {
+      background-color: #d1e6f5;
+    }
+
+    #audioPlayback {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li onclick="location.href='Home.html'">Home</li>
+    <li onclick="location.href='History.html'">History</li>
+    <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+    <li onclick="location.href='Profile.html'">Profile</li>
+  </ul>
+</div>
+
+<!-- 본문 -->
+<div class="content">
+  <h2 id="title">일기 제목</h2>
+  <div class="meta" id="meta">날짜 · 감정</div>
+
+  <div class="field">
+    <label>감정의 이유</label>
+    <div id="reason"></div>
+  </div>
+
+  <div class="field">
+    <label>그때의 생각</label>
+    <div id="thought"></div>
+  </div>
+
+  <div class="field">
+    <label>자유 표현</label>
+    <div id="expression"></div>
+  </div>
+
+  <div class="field">
+    <label>녹음 파일</label>
+    <div id="audio">
+      <audio id="audioPlayback" controls></audio>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="edit" id="editBtn">수정하기</button>
+    <button class="delete" id="deleteBtn">삭제하기</button>
+  </div>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const diaryId = urlParams.get("id");
+
+  fetch(`/api/emotion-diary/${diaryId}`)
+    .then(response => {
+      if (!response.ok) throw new Error("일기 불러오기 실패");
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById("title").textContent = data.title;
+      document.getElementById("meta").textContent = `${data.date} · ${data.emotion}`;
+      document.getElementById("reason").textContent = data.reason || "작성 내용 없음";
+      document.getElementById("thought").textContent = data.thought || "작성 내용 없음";
+      document.getElementById("expression").textContent = data.expression || "작성 내용 없음";
+
+      const audio = document.getElementById("audioPlayback");
+      if (data.audioUrl) {
+        audio.src = data.audioUrl;
+        audio.style.display = "block";
+      } else {
+        document.getElementById("audio").textContent = "녹음 없음";
+      }
+    })
+    .catch(err => {
+      alert("오류: " + err.message);
+    });
+
+  document.getElementById("editBtn").addEventListener("click", () => {
+    location.href = `edit.html?diaryId=${diaryId}`;
+  });
+
+  document.getElementById("deleteBtn").addEventListener("click", () => {
+    if (confirm("정말 삭제하시겠습니까?")) {
+      fetch(`/api/emotion-diary/${diaryId}`, {
+        method: "DELETE"
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("삭제 실패");
+          alert("삭제 완료!");
+          location.href = "History.html";
+        })
+        .catch(err => {
+          alert("삭제 중 오류 발생: " + err.message);
+        });
+    }
+  });
+</script>
+</body>
+</html>

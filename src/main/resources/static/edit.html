@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>감정일기 수정</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Fredoka:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+          margin: 0;
+          font-family: 'Arial', sans-serif;
+          display: flex;
+        }
+
+        .sidebar {
+          width: 190px;
+          height: 100vh;
+          border-right: 1px solid #ccc;
+          padding: 20px;
+          box-sizing: border-box;
+        }
+
+        .sidebar img {
+          width: 40px;
+          vertical-align: middle;
+        }
+
+        .sidebar h1 {
+          font-family: 'Fredoka', sans-serif;
+          font-size: 17px;
+          display: inline-block;
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+
+        .menu {
+          margin-top: 40px;
+          list-style: none;
+          padding: 0;
+        }
+
+        .menu li {
+          margin: 16px 0;
+          font-size: 14px;
+          cursor: pointer;
+        }
+
+        .content {
+          flex: 1;
+          padding: 50px 80px;
+          box-sizing: border-box;
+        }
+
+        h2 {
+          font-size: 15px;
+          margin-bottom: 30px;
+          font-weight: bold;
+          color: #333;
+        }
+
+        .form-group {
+          margin-bottom: 30px;
+        }
+
+        .form-group label {
+          display: block;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 10px;
+          color: #222;
+        }
+
+        .form-group input,
+        .form-group textarea {
+          width: 100%;
+          max-width: 800px;
+          padding: 12px;
+          font-size: 13px;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          background-color: #fff;
+          box-sizing: border-box;
+          transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+          outline: none;
+          border-color: #6EC6FF;
+          box-shadow: 0 0 6px rgba(110, 198, 255, 0.3);
+        }
+
+        .form-group textarea {
+          height: 80px;
+          resize: vertical;
+        }
+
+        #selected-emotion {
+          display: inline-block;
+          background-color: #d1ecff;
+          color: black;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+          margin-left: 10px;
+        }
+
+        .voice-record {
+          margin-top: 30px;
+          color: #4a90e2;
+          font-size: 13px;
+        }
+
+        .voice-record button {
+          margin-top: 10px;
+          padding: 10px 18px;
+          font-size: 14px;
+          background-color: #d1ecff;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .save-button {
+          display: block;
+          margin: 40px auto 0 auto;
+          background-color: #a8d9ff;
+          color: black;
+          border: none;
+          padding: 14px 18px;
+          font-size: 13px;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        .modal {
+          position: fixed;
+          top: 45%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: white;
+          padding: 40px 30px;
+          min-width: 200px;
+          max-width: 320px;
+          text-align: center;
+          border-radius: 10px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+          display: none;
+          z-index: 999;
+        }
+
+        .modal .close {
+          position: absolute;
+          top: 8px;
+          right: 12px;
+          font-size: 20px;
+          cursor: pointer;
+          color: #666;
+        }
+
+        #modal-message {
+          font-size: 16px;
+          color: #333;
+          margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <img src="image/logo.png" alt="로고"><h1>SOUL SCRIBBLES</h1>
+    <ul class="menu">
+        <li onclick="location.href='Home.html'">Home</li>
+        <li onclick="location.href='History.html'"><strong>History</strong></li>
+        <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+        <li onclick="location.href='Profile.html'">Profile</li>
+    </ul>
+</div>
+
+<div class="content">
+    <h2>감정 일기 수정</h2>
+
+    <div class="form-group">
+        <label>제목</label>
+        <input type="text" id="title">
+    </div>
+
+    <div class="form-group">
+        <label>오늘의 감정<span id="selected-emotion">감정 없음</span></label>
+    </div>
+
+    <div class="form-group">
+        <label>감정을 느끼게 된 이유</label>
+        <textarea id="q2"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>감정으로 인한 생각</label>
+        <textarea id="q3"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>자유 표현</label>
+        <textarea id="q4"></textarea>
+    </div>
+
+    <div class="voice-record">
+        음성 녹음을 통해 감정을 표현해보세요.
+        <br><button onclick="toggleRecording()">🎙️ 녹음 시작</button>
+        <br>
+        <audio id="audioPlayback" controls style="display:none; margin-top:10px;"></audio>
+        <br>
+        <button id="deleteAudioBtn" onclick="deleteRecording()" style="display:none; margin-top:10px;">🗑️ 녹음 삭제</button>
+    </div>
+
+    <button class="save-button" onclick="handleUpdate()">수정 완료</button>
+
+    <div class="modal" id="modal">
+        <div class="close" onclick="goToHistoryPage()">✕</div>
+        <div id="modal-message">수정 완료!</div>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const diaryId = params.get("diaryId");
+    const emotionSpan = document.getElementById('selected-emotion');
+
+    emotionSpan.addEventListener('click', function () {
+      window.open('popup-select-emotion.html', 'EmotionSelectPopup', 'width=500,height=600,left=400,top=200');
+    });
+
+    window.addEventListener("focus", function () {
+      const updatedEmotion = localStorage.getItem("selectedEmotion");
+      emotionSpan.textContent = updatedEmotion && updatedEmotion !== "null" ? updatedEmotion : "감정 없음";
+    });
+
+    // Load diary data
+    fetch(`/api/emotion-diary/${diaryId}`, { method: 'GET', credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("title").value = data.title;
+        document.getElementById("q2").value = data.reason;
+        document.getElementById("q3").value = data.thought;
+        document.getElementById("q4").value = data.expression;
+        emotionSpan.textContent = data.emotion;
+        localStorage.setItem("selectedEmotion", data.emotion);
+
+        if (data.audioUrl) {
+          const audio = document.getElementById("audioPlayback");
+          audio.src = data.audioUrl;
+          audio.dataset.audioUrl = data.audioUrl;
+          audio.style.display = "block";
+          document.getElementById("deleteAudioBtn").style.display = "inline-block"; // ✅ 기존 오디오 있을 때 삭제 버튼 표시
+        }
+      });
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function toggleRecording() {
+      const button = document.querySelector(".voice-record button");
+
+      if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const formData = new FormData();
+            formData.append("file", audioBlob, "recording.webm");
+
+            fetch("/api/emotion-diary/upload/audio", {
+              method: "POST",
+              body: formData
+            })
+            .then(res => res.json())
+            .then(result => {
+              const audio = document.getElementById("audioPlayback");
+              audio.src = result.audioUrl;
+              audio.dataset.audioUrl = result.audioUrl;
+              audio.style.display = "block";
+              document.getElementById("deleteAudioBtn").style.display = "inline-block";
+            });
+          };
+
+          audioChunks = [];
+          mediaRecorder.start();
+          button.textContent = "⏹️ 녹음 중지";
+
+        } catch (err) {
+          alert("마이크 권한이 필요합니다: " + err.message);
+        }
+
+      } else if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        button.textContent = "🎙️ 녹음 시작";
+      }
+    }
+
+    function deleteRecording() {
+      const audio = document.getElementById("audioPlayback");
+      audio.src = "";
+      audio.style.display = "none";
+      audio.removeAttribute("data-audio-url");
+      document.getElementById("deleteAudioBtn").style.display = "none";
+    }
+
+    function handleUpdate() {
+      const title = document.getElementById("title").value;
+      const reason = document.getElementById("q2").value;
+      const thought = document.getElementById("q3").value;
+      const expression = document.getElementById("q4").value;
+      const emotion = localStorage.getItem("selectedEmotion");
+      const audioUrl = document.getElementById("audioPlayback").dataset.audioUrl || null;
+
+      if (!title || !emotion || emotion === "null") {
+        alert("제목과 감정을 입력해주세요.");
+        return;
+      }
+
+      fetch(`/api/emotion-diary/${diaryId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          title, reason, thought, expression, emotion, audioUrl
+        })
+      })
+      .then(async res => {
+        const msg = await res.text();
+        if (!res.ok) throw new Error(msg);
+        return msg;
+      })
+      .then(result => {
+        document.getElementById("modal-message").textContent = result;
+        document.getElementById("modal").style.display = "block";
+      })
+      .catch(err => {
+        alert("수정 중 오류가 발생했습니다: " + err.message);
+      });
+    }
+
+    function goToHistoryPage() {
+      window.location.href = "History.html";
+    }
+</script>
+
+
+</body>
+</html>

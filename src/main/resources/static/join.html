@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>SOUL SCRIBBLES 회원가입</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .join-container {
+      text-align: center;
+      border: 1px solid #ccc;
+      padding: 60px;
+      border-radius: 8px;
+      width: 400px;
+      box-sizing: border-box;
+    }
+
+    .join-container img {
+        width: 100px;
+        margin-bottom: 5px;
+    }
+
+    .join-container h1 {
+        font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 35px;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    .join-container input[type="text"],
+    .join-container input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      background-color: #e8e8e8;
+      border: none;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+
+    .join-container button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background-color: #90caf9;
+      color: #000;
+      border: none;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .join-container button:hover {
+      background-color: #64b5f6;
+    }
+  </style>
+</head>
+<body>
+<div class="join-container">
+  <img src="image/logo.png" alt="로고">
+  <h1>SOUL SCRIBBLES</h1>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="이름" required><br>
+    <input type="text" id="email" placeholder="E-mail" required><br>
+    <input type="password" id="password" placeholder="비밀번호" required><br>
+    <input type="password" id="passwordConfirm" placeholder="비밀번호 확인" required><br>
+    <button type="submit">가입하기</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("registerForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // form 기본 제출 막기
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById("passwordConfirm").value;
+
+    if (password !== passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    const createdAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    fetch("/api/user/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, password, createdAt })
+    })
+    .then(response => response.text())
+    .then(data => {
+      alert(data);
+      if (data === "회원가입 성공!") {
+        window.location.href = "/login.html";
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("회원가입 중 오류 발생");
+    });
+  });
+</script>
+</body>
+</html>

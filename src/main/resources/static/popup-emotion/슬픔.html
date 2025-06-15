@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>슬픔 세부 감정 선택</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .emotion-detail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .emotion {
+      background-color: #a5d4ed;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .emotion:hover {
+      background-color: #9accf0;
+    }
+    .back {
+      margin-bottom: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="back" onclick="location.href='../popup-select-emotion.html'">← 돌아가기</div>
+
+<h2>슬픔을 고르셨군요! 어떤 종류의 슬픔이었나요?</h2>
+
+<div class="emotion-detail">
+  <div class="emotion" onclick="selectEmotion('실망')">실망</div>
+  <div class="emotion" onclick="selectEmotion('심란함')">심란함</div>
+  <div class="emotion" onclick="selectEmotion('꺾임')">꺾임</div>
+  <div class="emotion" onclick="selectEmotion('우울')">우울</div>
+  <div class="emotion" onclick="selectEmotion('절망')">절망</div>
+  <div class="emotion" onclick="selectEmotion('괴로움')">괴로움</div>
+  <div class="emotion" onclick="selectEmotion('불행')">불행</div>
+  <div class="emotion" onclick="selectEmotion('비참')">비참</div>
+  <div class="emotion" onclick="selectEmotion('소외')">소외</div>
+  <div class="emotion" onclick="selectEmotion('서러움')">서러움</div>
+  <div class="emotion" onclick="selectEmotion('패배감')">패배감</div>
+  <div class="emotion" onclick="selectEmotion('외로움')">외로움</div>
+</div>
+
+<script>
+  function selectEmotion(detailEmotion) {
+    const topEmotion = '슬픔';
+
+    // 로컬에 저장
+    localStorage.setItem('selectedEmotion', detailEmotion);
+    localStorage.setItem('topEmotion', topEmotion);
+
+    // 서버에 감정 전송
+    fetch('/api/emotion/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topEmotion, detailEmotion })
+    })
+    .then(res => res.text())
+    .then(message => {
+      alert(message);
+      if (message.includes("완료")) {
+        window.close();
+      }
+    })
+    .catch(error => {
+      alert('전송 실패: ' + error.message);
+      window.close();
+    });
+  }
+</script>
+
+</body>
+</html>

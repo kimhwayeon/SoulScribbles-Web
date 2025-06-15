@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정일기 목록</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #fff;
+      position: relative;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 10px;
+    }
+
+    .diary-entry {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    .diary-entry:hover {
+      background-color: #f5f5f5;
+    }
+
+    .diary-title {
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .diary-meta {
+      color: #666;
+      font-size: 13px;
+      font-weight: 400;
+      margin-top: 4px;
+    }
+
+    .add-button {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #eee;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      line-height: 40px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      z-index: 10;
+    }
+
+    .add-button:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+  <div>
+    <img src="image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li onclick="location.href='Home.html'">Home</li>
+    <li onclick="location.href='History.html'"><strong>History</strong></li>
+    <li onclick="location.href='TarotCard.html'">Tarot Card</li>
+    <li onclick="location.href='Profile.html'">Profile</li>
+  </ul>
+</div>
+
+<!-- 본문 -->
+<div class="content">
+  <h2>History</h2>
+  <div id="diaryList">불러오는 중...</div>
+
+  <div class="add-button" onclick="location.href='register.html'">+</div>
+</div>
+
+<script>
+  fetch('/api/emotion-diary/list')
+  .then(response => response.json())
+  .then(data => {
+    const list = document.getElementById("diaryList");
+    list.innerHTML = '';
+
+    if (!Array.isArray(data) || data.length === 0) {
+      list.innerHTML = "<p>작성된 감정일기가 없습니다.</p>";
+      return;
+    }
+
+    // 최신 날짜 + 시간 기준 정렬
+    data.sort((a, b) => new Date(b.date + 'T' + (b.createdAt || '00:00:00')) - new Date(a.date + 'T' + (a.createdAt || '00:00:00')));
+
+    data.forEach(diary => {
+      const entry = document.createElement("div");
+      entry.className = "diary-entry";
+      entry.innerHTML = `
+        <div class="diary-title">${diary.title}</div>
+        <div class="diary-meta">${diary.date} · ${diary.emotion}</div>
+      `;
+      entry.addEventListener("click", () => {
+        location.href = `detail.html?id=${diary.diaryId}`;
+      });
+      list.appendChild(entry);
+    });
+  })
+  .catch(error => {
+    document.getElementById("diaryList").innerHTML = `<p>오류 발생: ${error.message}</p>`;
+  });
+</script>
+
+</body>
+</html>

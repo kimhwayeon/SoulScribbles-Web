@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>분노 세부 감정 선택</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 190px;
+      height: 100vh;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar img {
+      width: 40px;
+      vertical-align: middle;
+    }
+
+    .sidebar h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      display: inline-block;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .menu {
+      margin-top: 40px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .menu li {
+      margin: 16px 0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+      background-color: #f9f9f9;
+    }
+
+    .emotion-detail-box {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .back-arrow {
+      font-size: 20px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .emotion-detail-box p {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 40px;
+    }
+
+    .detail-emotions {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .emotion-row {
+      display: flex;
+      gap: 30px;
+    }
+
+    .detail-emotions span {
+      background-color: #f3aeae;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .detail-emotions span:hover {
+      background-color: #ffa5a5;
+    }
+  </style>
+
+  <script>
+    function selectEmotion(detailEmotion) {
+      const topEmotion = localStorage.getItem('topEmotion');
+
+      // 세부 감정을 localStorage에 저장
+      localStorage.setItem('selectedEmotion', detailEmotion);
+
+      // 서버에 전송
+      fetch('/api/emotion/select', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ topEmotion, detailEmotion })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("감정 저장 실패");
+        return response.text();
+      })
+      .then(message => {
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem("lastEmotionDate", today);
+        alert(message);
+        if (message.includes("완료") || message.includes("성공")) {
+          window.location.href = '/Home.html';
+        }
+      })
+      .catch(error => {
+        alert("에러 발생: " + error.message);
+      });
+    }
+  </script>
+
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div class="sidebar">
+  <div>
+    <img src="../image/logo.png" alt="로고">
+    <h1>SOUL SCRIBBLES</h1>
+  </div>
+  <ul class="menu">
+    <li>Home</li>
+    <li>History</li>
+    <li>Tarot Card</li>
+    <li>Profile</li>
+  </ul>
+</div>
+
+<!-- 본문 -->
+<div class="content">
+  <div class="emotion-detail-box">
+    <div class="back-arrow" onclick="location.href='../select-emotion.html'">←</div>
+    <p>분노를 고르셨군요. 어떤 종류의 분노였나요?</p>
+    <div class="detail-emotions">
+      <div class="emotion-row">
+        <span onclick="selectEmotion('화남')">화남</span>
+        <span onclick="selectEmotion('복수심')">복수심</span>
+        <span onclick="selectEmotion('심술남')">심술남</span>
+        <span onclick="selectEmotion('속상함')">속상함</span>
+      </div>
+      <div class="emotion-row">
+        <span onclick="selectEmotion('짜증')">짜증</span>
+        <span onclick="selectEmotion('안달남')">안달남</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
