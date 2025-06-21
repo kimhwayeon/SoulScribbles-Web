@@ -32,7 +32,6 @@ cd SoulScribbles-Web
 
 1. 초록색 **`<> Code`** 버튼 클릭
 2. **Download ZIP** 선택  
-   ![Download ZIP](https://docs.github.com/assets/images/help/repository/code-dropdown-download-zip.png)
 
 ---
 
